@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Inscription Médecin</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="login-container">
+
+        <h2>Créer un compte médecin</h2>
+
+        <form action="register_medecin.php" method="POST">
+
+            <input type="text" name="nom" placeholder="Nom" required>
+            <input type="text" name="prenom" placeholder="Prénom" required>
+            <input type="email" name="email" placeholder="Email" required>
+            <input type="password" name="password" placeholder="Mot de passe" required>
+            <input type="text" name="specialite" placeholder="Spécialité (ex: Cardiologue)" required>
+            <input type="text" name="localisation" placeholder="Ville / Adresse" required>
+
+            <select name="type_calendrier">
+    <option value="15">15 min par créneau</option>
+    <option value="20" selected>20 min par créneau</option>
+    <option value="30">30 min par créneau</option>
+</select>
+
+            <input type="text" name="telephone" placeholder="Téléphone (optionnel)">
+
+            <button type="submit">S'inscrire</button>
+
+        </form>
+
+        <p class="link">
+            Déjà un compte ? <a href="login.html">Se connecter</a>
+        </p>
+
+
+    </div>
+
+</body>
+
+</html>

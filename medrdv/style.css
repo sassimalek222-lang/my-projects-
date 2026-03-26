@@ -1,0 +1,343 @@
+/* Reset de base */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background-color: #f0f4f8;
+    color: #333;
+}
+
+
+/* Header avec logo */
+
+header {
+    padding: 20px 40px;
+    background-color: #fff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+header .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+header .logo img {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+}
+
+header h1 {
+    font-size: 2rem;
+    color: #2b7a78;
+}
+
+
+/* Sidebar à droite */
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 220px;
+    height: 100%;
+    background-color: rgba(43, 122, 120, 0.95);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 100px;
+    box-shadow: -3px 0 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px 0 0 10px;
+}
+
+.sidebar a {
+    width: 80%;
+    text-align: center;
+    color: #fff;
+    text-decoration: none;
+    padding: 15px 0;
+    margin: 10px 0;
+    font-weight: 500;
+    border-radius: 50px;
+    transition: 0.3s;
+}
+
+.sidebar a:hover {
+    background-color: #3aafa9;
+    transform: translateX(-5px);
+}
+
+
+/* Hero section */
+
+.hero {
+    margin-right: 220px;
+    text-align: center;
+    padding: 120px 40px;
+    background: linear-gradient(135deg, #3aafa9, #2b7a78);
+    color: #fff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.hero h2 {
+    font-size: 3rem;
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+.hero p {
+    font-size: 1.2rem;
+    margin-bottom: 30px;
+}
+
+.hero .btn {
+    display: inline-block;
+    padding: 15px 35px;
+    background-color: #def2f1;
+    color: #17252a;
+    font-weight: 600;
+    border-radius: 50px;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.hero .btn:hover {
+    background-color: #3aafa9;
+    color: #fff;
+    transform: scale(1.05);
+}
+
+
+/* Responsive */
+
+@media (max-width: 768px) {
+    .sidebar {
+        position: relative;
+        width: 100%;
+        height: auto;
+        flex-direction: row;
+        justify-content: center;
+        border-radius: 0;
+        box-shadow: none;
+        padding: 10px 0;
+    }
+    .sidebar a {
+        margin: 0 10px;
+        width: auto;
+        padding: 10px 20px;
+    }
+    .hero {
+        margin-right: 0;
+        padding: 80px 20px;
+    }
+    .hero h2 {
+        font-size: 2rem;
+    }
+    header .logo {
+        justify-content: center;
+    }
+}
+
+
+/* Reset de base */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #3aafa9, #2b7a78);
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+
+/* Container du login */
+
+.login-container {
+    background-color: rgba(255, 255, 255, 0.95);
+    padding: 40px 50px;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+
+
+/* Titre */
+
+.login-container h2 {
+    font-size: 18px;
+    font-weight: 500;
+    color: #2b7a78;
+    margin-bottom: 20px;
+}
+
+
+/* Inputs */
+
+.login-container input[type="email"],
+.login-container input[type="password"] {
+    width: 100%;
+    padding: 15px 20px;
+    margin: 10px 0 20px 0;
+    border: 1px solid #ccc;
+    border-radius: 50px;
+    font-size: 1rem;
+    outline: none;
+    transition: 0.3s;
+}
+
+.login-container input[type="email"]:focus,
+.login-container input[type="password"]:focus {
+    border-color: #3aafa9;
+    box-shadow: 0 0 8px rgba(58, 175, 169, 0.5);
+}
+
+
+/* Bouton */
+
+.login-container button {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 50px;
+    background-color: #3aafa9;
+    color: #fff;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.login-container button:hover {
+    background-color: #2b7a78;
+    transform: scale(1.05);
+}
+
+
+/* Lien */
+
+.login-container .link {
+    margin-top: 20px;
+    font-size: 0.9rem;
+}
+
+.login-container .link a {
+    color: #3aafa9;
+    text-decoration: none;
+    font-weight: 500;
+    transition: 0.3s;
+}
+
+.login-container .link a:hover {
+    text-decoration: underline;
+}
+
+
+/* Inputs généraux pour register medecin ou patient */
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+    width: 100%;
+    padding: 15px 20px;
+    margin: 10px 0 6px 0;
+    border: 1px solid #ccc;
+    border-radius: 50px;
+    font-size: 1rem;
+    outline: none;
+    transition: 0.3s;
+    background-color: #fefefe;
+}
+
+
+/* Focus effect */
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus {
+    border-color: #3aafa9;
+    box-shadow: 0 0 8px rgba(58, 175, 169, 0.5);
+}
+
+
+/* Placeholder style */
+
+input::placeholder {
+    color: #aaa;
+    font-weight: 500;
+}
+
+
+/* Si tu veux, tu peux ajouter un container autour des inputs pour centrer */
+
+.form-container {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 40px;
+    background-color: rgba(255, 255, 255, 0.95);
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+
+/* Style pour select */
+
+select {
+    width: 100%;
+    padding: 15px 20px;
+    margin: 10px 0 20px 0;
+    border: 1px solid #ccc;
+    border-radius: 50px;
+    font-size: 1rem;
+    outline: none;
+    background-color: #fefefe;
+    appearance: none;
+    /* Supprime l'apparence par défaut */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+
+/* Focus effect */
+
+select:focus {
+    border-color: #3aafa9;
+    box-shadow: 0 0 8px rgba(58, 175, 169, 0.5);
+}
+
+
+/* Option style (optionnel) */
+
+select option {
+    padding: 10px;
+}
+
+
+/* Ajouter une flèche custom si tu veux */
+
+select::-ms-expand {
+    display: none;
+}
