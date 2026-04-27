@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel Admin — MedRDV</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --midnight: #0a0f1e;
+  --navy: #0d1b3e;
+  --sky: #2563eb;
+  --ice: #60a5fa;
+  --teal: #0ea5a0;
+  --mint: #34d399;
+  --gold: #f59e0b;
+  --white: #ffffff;
+  --muted: #94a3b8;
+  --border: rgba(255,255,255,0.08);
+  --card: rgba(13,27,62,0.6);
+  --error: #f87171;
+  --success: #34d399;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--midnight);
+  color: var(--white);
+  display: flex; min-height: 100vh;
+}
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background: radial-gradient(ellipse 50% 60% at 10% 10%, rgba(245,158,11,0.06) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: 240px; flex-shrink: 0;
+  background: rgba(13,27,62,0.85);
+  border-right: 1px solid var(--border);
+  padding: 24px 16px;
+  position: fixed; top:0; left:0; bottom:0;
+  z-index: 100; display: flex; flex-direction: column;
+}
+.sidebar-logo {
+  display: flex; align-items: center; gap: 10px;
+  text-decoration: none; padding: 8px; margin-bottom: 8px;
+}
+.logo-icon {
+  width: 34px; height: 34px;
+  background: linear-gradient(135deg, var(--gold), #d97706);
+  border-radius: 9px; display: flex; align-items: center;
+  justify-content: center; font-size: 15px;
+}
+.logo-text { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; }
+.logo-text span { color: var(--gold); }
+.admin-role-badge {
+  background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.25);
+  border-radius: 6px; padding: 4px 10px; font-size: 10px;
+  font-weight: 700; color: var(--gold); text-transform: uppercase;
+  letter-spacing: 0.08em; text-align: center; margin-bottom: 24px;
+}
+.nav-section {
+  font-size: 10px; font-weight: 600; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.08em;
+  padding: 0 8px; margin-bottom: 8px; margin-top: 16px;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border-radius: 10px;
+  color: var(--muted); text-decoration: none;
+  font-size: 0.875rem; font-weight: 500;
+  transition: all 0.2s; cursor: pointer;
+  border: none; background: none; width: 100%; text-align: left;
+}
+.nav-item:hover { background: rgba(255,255,255,0.05); color: var(--white); }
+.nav-item.active { background: rgba(245,158,11,0.12); color: var(--gold); }
+.nav-item .icon { width: 18px; text-align: center; font-size: 0.9rem; }
+.badge-count {
+  margin-left: auto; background: var(--error);
+  color: #fff; border-radius: 10px;
+  padding: 1px 7px; font-size: 10px; font-weight: 700;
+  display: none;
+}
+.badge-count.show { display: inline-block; }
+.sidebar-footer { margin-top: auto; padding-top: 16px; border-top: 1px solid var(--border); }
+.admin-info { padding: 8px 12px; font-size: 0.8rem; color: var(--muted); margin-bottom: 8px; }
+.admin-info strong { color: var(--white); display: block; }
+
+/* MAIN */
+.main { margin-left: 240px; flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+.topbar {
+  padding: 18px 32px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(10,15,30,0.6); backdrop-filter: blur(12px);
+  position: sticky; top: 0; z-index: 50;
+}
+.page-title { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 700; }
+.page-subtitle { font-size: 0.8rem; color: var(--muted); margin-top: 2px; }
+.topbar-actions { display: flex; gap: 0.75rem; align-items: center; }
+.btn-sm {
+  padding: 7px 16px; border-radius: 8px;
+  font-size: 0.825rem; font-weight: 600; cursor: pointer;
+  border: none; font-family: inherit; transition: all 0.2s;
+}
+.btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--muted); }
+.btn-ghost:hover { border-color: rgba(255,255,255,0.2); color: var(--white); }
+.btn-danger { background: rgba(248,113,113,0.15); border: 1px solid rgba(248,113,113,0.3); color: var(--error); }
+.btn-danger:hover { background: rgba(248,113,113,0.25); }
+.btn-success { background: rgba(52,211,153,0.15); border: 1px solid rgba(52,211,153,0.3); color: var(--success); }
+.btn-success:hover { background: rgba(52,211,153,0.25); }
+.btn-gold { background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.3); color: var(--gold); }
+.btn-gold:hover { background: rgba(245,158,11,0.25); }
+
+.content { padding: 28px 32px; flex: 1; }
+
+/* SECTIONS */
+.section { display: none; }
+.section.active { display: block; }
+
+/* STATS GRID */
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; margin-bottom: 28px; }
+.stat-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 20px;
+  position: relative; overflow: hidden;
+}
+.stat-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0;
+  height: 3px; background: var(--accent, var(--teal));
+}
+.stat-label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+.stat-value { font-size: 2rem; font-weight: 700; line-height: 1; }
+.stat-sub { font-size: 0.75rem; color: var(--muted); margin-top: 6px; }
+
+/* ALERT BANNER */
+.alert-banner {
+  background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.25);
+  border-radius: 12px; padding: 14px 18px;
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 20px; font-size: 0.875rem;
+  cursor: pointer; transition: background 0.2s;
+}
+.alert-banner:hover { background: rgba(245,158,11,0.15); }
+.alert-banner .alert-icon { font-size: 1.2rem; }
+.alert-banner .alert-text { flex: 1; }
+.alert-banner .alert-text strong { color: var(--gold); }
+.alert-banner .alert-action { color: var(--gold); font-weight: 600; font-size: 0.8rem; }
+
+/* TABLE */
+.table-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; overflow: hidden; margin-bottom: 20px;
+}
+.table-header {
+  padding: 16px 20px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.table-title { font-weight: 600; font-size: 0.95rem; }
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+th { padding: 10px 16px; text-align: left; font-size: 0.75rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.02); }
+td { padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.04); vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: rgba(255,255,255,0.02); }
+
+/* BADGES */
+.badge {
+  display: inline-flex; align-items: center;
+  padding: 3px 10px; border-radius: 20px;
+  font-size: 0.72rem; font-weight: 600; letter-spacing: 0.03em;
+}
+.badge-actif { background: rgba(52,211,153,0.12); color: var(--success); border: 1px solid rgba(52,211,153,0.25); }
+.badge-attente { background: rgba(245,158,11,0.12); color: var(--gold); border: 1px solid rgba(245,158,11,0.25); }
+.badge-suspendu { background: rgba(248,113,113,0.12); color: var(--error); border: 1px solid rgba(248,113,113,0.25); }
+.badge-patient { background: rgba(96,165,250,0.12); color: var(--ice); border: 1px solid rgba(96,165,250,0.25); }
+.badge-medecin { background: rgba(52,211,153,0.12); color: var(--mint); border: 1px solid rgba(52,211,153,0.25); }
+.badge-admin { background: rgba(245,158,11,0.12); color: var(--gold); border: 1px solid rgba(245,158,11,0.25); }
+
+/* FILTER BAR */
+.filter-bar { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+.filter-bar select, .filter-bar input {
+  background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+  color: var(--white); border-radius: 8px; padding: 7px 12px;
+  font-size: 0.825rem; font-family: inherit; outline: none;
+}
+.filter-bar select:focus, .filter-bar input:focus { border-color: var(--gold); }
+.filter-bar option { background: #0d1b3e; }
+
+/* MEDECIN CARD (pending) */
+.medecin-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 20px; margin-bottom: 14px;
+  transition: border-color 0.2s;
+}
+.medecin-card:hover { border-color: rgba(245,158,11,0.3); }
+.medecin-card-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px; }
+.medecin-name { font-weight: 600; font-size: 1rem; margin-bottom: 2px; }
+.medecin-email { font-size: 0.8rem; color: var(--muted); }
+.medecin-meta { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+.meta-item { font-size: 0.8rem; }
+.meta-item span { color: var(--muted); margin-right: 4px; }
+.medecin-actions { display: flex; gap: 8px; }
+
+/* MODAL */
+.modal-overlay {
+  display: none; position: fixed; inset: 0; z-index: 999;
+  background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+  align-items: center; justify-content: center; padding: 1rem;
+}
+.modal-overlay.open { display: flex; }
+.modal-box {
+  background: #0d1b3e; border: 1px solid var(--border);
+  border-radius: 16px; padding: 28px; max-width: 460px;
+  width: 100%; max-height: 90vh; overflow-y: auto;
+}
+.modal-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 6px; }
+.modal-sub { font-size: 0.825rem; color: var(--muted); margin-bottom: 20px; }
+.form-group { margin-bottom: 14px; }
+.form-group label { display: block; font-size: 0.8rem; color: var(--muted); margin-bottom: 6px; }
+.form-group textarea {
+  width: 100%; padding: 10px 12px; background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border); border-radius: 8px; color: var(--white);
+  font-family: inherit; font-size: 0.875rem; resize: vertical; outline: none; min-height: 80px;
+}
+.form-group textarea:focus { border-color: var(--error); }
+.modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+
+/* TOAST */
+#toast {
+  position: fixed; bottom: 28px; right: 28px;
+  padding: 12px 20px; border-radius: 10px;
+  font-size: 0.875rem; font-weight: 500;
+  z-index: 9999; transform: translateY(80px); opacity: 0;
+  transition: all 0.3s; pointer-events: none;
+  max-width: 360px;
+}
+#toast.show { transform: translateY(0); opacity: 1; }
+#toast.success { background: #0d2e2b; border: 1px solid rgba(52,211,153,0.3); color: var(--success); }
+#toast.error { background: #2e0d0d; border: 1px solid rgba(248,113,113,0.3); color: var(--error); }
+
+/* EMPTY STATE */
+.empty-state {
+  text-align: center; padding: 48px 20px;
+  color: var(--muted); font-size: 0.9rem;
+}
+.empty-state .empty-icon { font-size: 2.5rem; margin-bottom: 12px; }
+
+/* LOADING */
+.loading { text-align: center; padding: 32px; color: var(--muted); }
+
+/* PAGINATION */
+.pagination { display: flex; align-items: center; gap: 8px; justify-content: center; padding: 16px; }
+.page-btn {
+  padding: 6px 12px; border-radius: 7px; border: 1px solid var(--border);
+  background: transparent; color: var(--muted); cursor: pointer; font-size: 0.825rem;
+  transition: all 0.2s;
+}
+.page-btn:hover, .page-btn.active { border-color: var(--gold); color: var(--gold); }
+.page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+@media (max-width: 768px) {
+  .sidebar { transform: translateX(-100%); }
+  .main { margin-left: 0; }
+}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <a href="index.html" class="sidebar-logo">
+    <div class="logo-icon">⚙️</div>
+    <div class="logo-text">Med<span>RDV</span></div>
+  </a>
+  <div class="admin-role-badge">⚡ Administrateur</div>
+
+  <div class="nav-section">Principal</div>
+  <button class="nav-item active" onclick="showSection('dashboard')" id="nav-dashboard">
+    <span class="icon">📊</span> Tableau de bord
+  </button>
+  <button class="nav-item" onclick="showSection('pending')" id="nav-pending">
+    <span class="icon">⏳</span> Médecins en attente
+    <span class="badge-count" id="pendingBadge">0</span>
+  </button>
+
+  <div class="nav-section">Gestion</div>
+  <button class="nav-item" onclick="showSection('users')" id="nav-users">
+    <span class="icon">👥</span> Utilisateurs
+  </button>
+  <button class="nav-item" onclick="showSection('rdv')" id="nav-rdv">
+    <span class="icon">📅</span> Rendez-vous
+  </button>
+
+  <div class="nav-section">Système</div>
+  <button class="nav-item" onclick="showSection('logs')" id="nav-logs">
+    <span class="icon">📋</span> Journaux
+  </button>
+
+  <div class="sidebar-footer">
+    <div class="admin-info">
+      <strong id="adminName">Admin</strong>
+      Espace administration
+    </div>
+    <button class="nav-item" onclick="handleLogout()">
+      <span class="icon">🚪</span> Déconnexion
+    </button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="topbar">
+    <div>
+      <div class="page-title" id="pageTitle">Tableau de bord</div>
+      <div class="page-subtitle" id="pageSubtitle">Vue d'ensemble de la plateforme</div>
+    </div>
+    <div class="topbar-actions">
+      <button class="btn-sm btn-ghost" onclick="refreshCurrent()">🔄 Actualiser</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ── DASHBOARD ── -->
+    <div class="section active" id="section-dashboard">
+      <div id="alertBanner" class="alert-banner" style="display:none;" onclick="showSection('pending')">
+        <span class="alert-icon">🔔</span>
+        <div class="alert-text">
+          <strong id="alertCount">0</strong> médecin(s) en attente de validation
+        </div>
+        <span class="alert-action">Voir →</span>
+      </div>
+
+      <div class="stats-grid" id="statsGrid">
+        <div class="loading">Chargement des statistiques…</div>
+      </div>
+
+      <div class="table-card">
+        <div class="table-header">
+          <div class="table-title">📋 Activité récente</div>
+        </div>
+        <div id="recentLogs"><div class="loading">Chargement…</div></div>
+      </div>
+    </div>
+
+    <!-- ── MÉDECINS EN ATTENTE ── -->
+    <div class="section" id="section-pending">
+      <div id="pendingList"><div class="loading">Chargement…</div></div>
+    </div>
+
+    <!-- ── UTILISATEURS ── -->
+    <div class="section" id="section-users">
+      <div class="filter-bar">
+        <select id="filterRole" onchange="loadUsers()">
+          <option value="">Tous les rôles</option>
+          <option value="patient">Patients</option>
+          <option value="medecin">Médecins</option>
+          <option value="admin">Admins</option>
+        </select>
+        <select id="filterStatut" onchange="loadUsers()">
+          <option value="">Tous les statuts</option>
+          <option value="actif">Actif</option>
+          <option value="en_attente">En attente</option>
+          <option value="suspendu">Suspendu</option>
+        </select>
+      </div>
+      <div class="table-card">
+        <div class="table-header">
+          <div class="table-title">👥 Utilisateurs</div>
+          <div id="usersCount" style="font-size:0.8rem;color:var(--muted);"></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Nom</th>
+                <th>Email</th>
+                <th>Rôle</th>
+                <th>Statut</th>
+                <th>Inscription</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="usersTable"><tr><td colspan="6" class="loading">Chargement…</td></tr></tbody>
+          </table>
+        </div>
+        <div id="usersPagination" class="pagination"></div>
+      </div>
+    </div>
+
+    <!-- ── RENDEZ-VOUS ── -->
+    <div class="section" id="section-rdv">
+      <div class="table-card">
+        <div class="table-header">
+          <div class="table-title">📅 Tous les rendez-vous</div>
+          <div id="rdvCount" style="font-size:0.8rem;color:var(--muted);"></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Patient</th>
+                <th>Médecin</th>
+                <th>Spécialité</th>
+                <th>Statut</th>
+                <th>Motif</th>
+              </tr>
+            </thead>
+            <tbody id="rdvTable"><tr><td colspan="6" class="loading">Chargement…</td></tr></tbody>
+          </table>
+        </div>
+        <div id="rdvPagination" class="pagination"></div>
+      </div>
+    </div>
+
+    <!-- ── LOGS ── -->
+    <div class="section" id="section-logs">
+      <div class="table-card">
+        <div class="table-header">
+          <div class="table-title">📋 Journal d'activité admin</div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Admin</th>
+                <th>Action</th>
+                <th>Détails</th>
+              </tr>
+            </thead>
+            <tbody id="logsTable"><tr><td colspan="4" class="loading">Chargement…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- MODAL REJET -->
+<div class="modal-overlay" id="rejectModal">
+  <div class="modal-box">
+    <div class="modal-title">❌ Rejeter la demande</div>
+    <div class="modal-sub">Cette action notifiera le médecin par email.</div>
+    <input type="hidden" id="rejectUserId">
+    <div class="form-group">
+      <label>Motif du rejet (optionnel)</label>
+      <textarea id="rejectRaison" placeholder="Ex: Numéro d'ordre invalide, dossier incomplet…"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-sm btn-ghost" onclick="closeRejectModal()">Annuler</button>
+      <button class="btn-sm btn-danger" onclick="confirmReject()">Rejeter</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+const API = 'backend/api-admin.php';
+let currentPage = { users: 1, rdv: 1 };
+
+// ── Init ──────────────────────────────────────────────────────
+async function init() {
+  try {
+    const res = await fetch(`${API}?action=check_admin_session`, { credentials: 'include' });
+    const data = await res.json();
+    if (!data.logged_in) {
+      window.location.href = 'login-admin.html';
+      return;
+    }
+    document.getElementById('adminName').textContent = data.prenom + ' ' + data.nom;
+    loadDashboard();
+  } catch(e) {
+    window.location.href = 'login-admin.html';
+  }
+}
+
+// ── Navigation ────────────────────────────────────────────────
+function showSection(name) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('section-' + name).classList.add('active');
+  document.getElementById('nav-' + name)?.classList.add('active');
+
+  const titles = {
+    dashboard: ['Tableau de bord', 'Vue d\'ensemble de la plateforme'],
+    pending:   ['Médecins en attente', 'Validation des dossiers médecins'],
+    users:     ['Utilisateurs', 'Gestion des comptes'],
+    rdv:       ['Rendez-vous', 'Historique complet'],
+    logs:      ['Journaux', 'Activité administrateur'],
+  };
+  if (titles[name]) {
+    document.getElementById('pageTitle').textContent    = titles[name][0];
+    document.getElementById('pageSubtitle').textContent = titles[name][1];
+  }
+
+  if (name === 'pending') loadPending();
+  if (name === 'users')   loadUsers();
+  if (name === 'rdv')     loadRdv();
+  if (name === 'logs')    loadLogs();
+}
+
+function refreshCurrent() {
+  const active = document.querySelector('.nav-item.active');
+  if (active) active.click();
+}
+
+// ── Dashboard ─────────────────────────────────────────────────
+async function loadDashboard() {
+  try {
+    const [statsRes, logsRes] = await Promise.all([
+      fetch(`${API}?action=get_stats`, { credentials: 'include' }),
+      fetch(`${API}?action=get_logs&limit=10`, { credentials: 'include' })
+    ]);
+    const statsData = await statsRes.json();
+    const logsData  = await logsRes.json();
+
+    if (statsData.success) renderStats(statsData.stats);
+    if (logsData.success)  renderRecentLogs(logsData.logs);
+  } catch(e) {
+    showToast('Erreur chargement dashboard', 'error');
+  }
+}
+
+function renderStats(stats) {
+  const pending = stats.medecins_en_attente || 0;
+
+  // Alert banner
+  const banner = document.getElementById('alertBanner');
+  if (pending > 0) {
+    banner.style.display = 'flex';
+    document.getElementById('alertCount').textContent = pending;
+    const badge = document.getElementById('pendingBadge');
+    badge.textContent = pending;
+    badge.classList.add('show');
+  }
+
+  const cards = [
+    { label: 'Total utilisateurs', value: stats.users?.total || 0, sub: 'tous rôles confondus', accent: '#60a5fa' },
+    { label: 'Patients', value: stats.users?.patient || 0, sub: 'comptes patients', accent: '#34d399' },
+    { label: 'Médecins actifs', value: stats.users?.medecin || 0, sub: 'praticiens', accent: '#0ea5a0' },
+    { label: 'En attente', value: pending, sub: 'validation requise', accent: '#f59e0b' },
+    { label: 'RDV total', value: stats.rdv_total || 0, sub: 'rendez-vous planifiés', accent: '#a78bfa' },
+    { label: 'RDV aujourd\'hui', value: stats.rdv_aujourd_hui || 0, sub: 'consultations du jour', accent: '#60a5fa' },
+    { label: 'Suspendus', value: stats.comptes_suspendus || 0, sub: 'comptes bloqués', accent: '#f87171' },
+    { label: 'Nouveaux (7j)', value: stats.nouveaux_7j || 0, sub: 'inscriptions récentes', accent: '#34d399' },
+  ];
+
+  document.getElementById('statsGrid').innerHTML = cards.map(c => `
+    <div class="stat-card" style="--accent:${c.accent}">
+      <div class="stat-label">${c.label}</div>
+      <div class="stat-value">${c.value}</div>
+      <div class="stat-sub">${c.sub}</div>
+    </div>
+  `).join('');
+}
+
+function renderRecentLogs(logs) {
+  if (!logs?.length) {
+    document.getElementById('recentLogs').innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div>Aucune activité enregistrée</div>`;
+    return;
+  }
+  document.getElementById('recentLogs').innerHTML = `
+    <table style="width:100%;border-collapse:collapse;font-size:0.875rem;">
+      <thead><tr>
+        <th style="padding:10px 16px;text-align:left;color:var(--muted);font-size:0.75rem;border-bottom:1px solid var(--border);">Date</th>
+        <th style="padding:10px 16px;text-align:left;color:var(--muted);font-size:0.75rem;border-bottom:1px solid var(--border);">Admin</th>
+        <th style="padding:10px 16px;text-align:left;color:var(--muted);font-size:0.75rem;border-bottom:1px solid var(--border);">Action</th>
+      </tr></thead>
+      <tbody>${logs.map(l => `
+        <tr>
+          <td style="padding:10px 16px;border-bottom:1px solid rgba(255,255,255,0.04);color:var(--muted);font-size:0.8rem;">${formatDate(l.created_at)}</td>
+          <td style="padding:10px 16px;border-bottom:1px solid rgba(255,255,255,0.04);">${l.prenom} ${l.nom}</td>
+          <td style="padding:10px 16px;border-bottom:1px solid rgba(255,255,255,0.04);color:var(--muted);">${l.details || l.action}</td>
+        </tr>
+      `).join('')}</tbody>
+    </table>
+  `;
+}
+
+// ── Médecins en attente ────────────────────────────────────────
+async function loadPending() {
+  document.getElementById('pendingList').innerHTML = '<div class="loading">Chargement…</div>';
+  try {
+    const res  = await fetch(`${API}?action=get_pending_medecins`, { credentials: 'include' });
+    const data = await res.json();
+    if (!data.success) throw new Error();
+
+    const list = data.medecins;
+    if (!list.length) {
+      document.getElementById('pendingList').innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">✅</div>
+          <strong>Aucune demande en attente</strong><br>
+          Tous les dossiers médecins ont été traités.
+        </div>`;
+      return;
+    }
+
+    document.getElementById('pendingList').innerHTML = list.map(m => `
+      <div class="medecin-card" id="card-${m.id}">
+        <div class="medecin-card-header">
+          <div>
+            <div class="medecin-name">Dr. ${m.prenom} ${m.nom}</div>
+            <div class="medecin-email">${m.email}</div>
+          </div>
+          <div>
+            ${m.email_verifie
+              ? '<span class="badge badge-actif">✅ Email vérifié</span>'
+              : '<span class="badge badge-attente">⏳ Email non vérifié</span>'
+            }
+          </div>
+        </div>
+        <div class="medecin-meta">
+          <div class="meta-item"><span>🩺 Spécialité :</span><strong>${m.specialite || '—'}</strong></div>
+          <div class="meta-item"><span>📍 Localisation :</span><strong>${m.localisation || '—'}</strong></div>
+          <div class="meta-item"><span>🏥 N° Ordre :</span><strong>${m.numero_ordre || '—'}</strong></div>
+          <div class="meta-item"><span>⏱️ Expérience :</span><strong>${m.annees_experience || 0} ans</strong></div>
+          <div class="meta-item"><span>📞 Tél :</span><strong>${m.telephone || '—'}</strong></div>
+          <div class="meta-item"><span>📅 Inscrit :</span><strong>${formatDate(m.created_at)}</strong></div>
+        </div>
+        <div class="medecin-actions">
+          <button class="btn-sm btn-success" onclick="validateMedecin(${m.id})">✅ Valider</button>
+          <button class="btn-sm btn-danger"  onclick="openRejectModal(${m.id})">❌ Rejeter</button>
+        </div>
+      </div>
+    `).join('');
+  } catch(e) {
+    document.getElementById('pendingList').innerHTML = '<div class="empty-state">Erreur chargement.</div>';
+  }
+}
+
+async function validateMedecin(userId) {
+  try {
+    const res  = await fetch(`${API}?action=validate_medecin`, {
+      method: 'POST', credentials: 'include', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ user_id: userId })
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast(data.message, 'success');
+      document.getElementById('card-' + userId)?.remove();
+      updatePendingBadge();
+    } else {
+      showToast(data.error || 'Erreur', 'error');
+    }
+  } catch(e) { showToast('Erreur serveur', 'error'); }
+}
+
+function openRejectModal(userId) {
+  document.getElementById('rejectUserId').value = userId;
+  document.getElementById('rejectRaison').value = '';
+  document.getElementById('rejectModal').classList.add('open');
+}
+function closeRejectModal() {
+  document.getElementById('rejectModal').classList.remove('open');
+}
+async function confirmReject() {
+  const userId = document.getElementById('rejectUserId').value;
+  const raison = document.getElementById('rejectRaison').value.trim();
+  try {
+    const res  = await fetch(`${API}?action=reject_medecin`, {
+      method: 'POST', credentials: 'include', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ user_id: userId, raison })
+    });
+    const data = await res.json();
+    closeRejectModal();
+    if (data.success) {
+      showToast(data.message, 'success');
+      document.getElementById('card-' + userId)?.remove();
+      updatePendingBadge();
+    } else {
+      showToast(data.error || 'Erreur', 'error');
+    }
+  } catch(e) { showToast('Erreur serveur', 'error'); }
+}
+
+function updatePendingBadge() {
+  const remaining = document.querySelectorAll('[id^="card-"]').length;
+  const badge = document.getElementById('pendingBadge');
+  badge.textContent = remaining;
+  if (remaining === 0) {
+    badge.classList.remove('show');
+    document.getElementById('alertBanner').style.display = 'none';
+  }
+}
+
+// ── Utilisateurs ──────────────────────────────────────────────
+async function loadUsers(page = 1) {
+  currentPage.users = page;
+  const role   = document.getElementById('filterRole').value;
+  const statut = document.getElementById('filterStatut').value;
+  document.getElementById('usersTable').innerHTML = `<tr><td colspan="6" class="loading">Chargement…</td></tr>`;
+
+  try {
+    const res  = await fetch(`${API}?action=get_users`, {
+      method: 'POST', credentials: 'include', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ role, statut, page })
+    });
+    const data = await res.json();
+    document.getElementById('usersCount').textContent = `${data.total} utilisateur(s)`;
+
+    if (!data.users?.length) {
+      document.getElementById('usersTable').innerHTML = `<tr><td colspan="6"><div class="empty-state">Aucun utilisateur trouvé</div></td></tr>`;
+      return;
+    }
+
+    document.getElementById('usersTable').innerHTML = data.users.map(u => `
+      <tr>
+        <td><strong>${u.prenom} ${u.nom}</strong>${u.specialite ? `<br><small style="color:var(--muted)">${u.specialite}</small>` : ''}</td>
+        <td style="color:var(--muted)">${u.email}</td>
+        <td><span class="badge badge-${u.role}">${u.role}</span></td>
+        <td><span class="badge badge-${u.statut === 'actif' ? 'actif' : u.statut === 'suspendu' ? 'suspendu' : 'attente'}">${u.statut}</span></td>
+        <td style="color:var(--muted);font-size:0.8rem">${formatDate(u.created_at)}</td>
+        <td>
+          ${u.role !== 'admin' ? `
+            ${u.statut === 'suspendu'
+              ? `<button class="btn-sm btn-success" onclick="userAction('activate', ${u.id})">Réactiver</button>`
+              : `<button class="btn-sm btn-danger"  onclick="userAction('suspend',  ${u.id})">Suspendre</button>`
+            }
+          ` : '<span style="color:var(--muted);font-size:0.75rem">—</span>'}
+        </td>
+      </tr>
+    `).join('');
+
+    renderPagination('usersPagination', data.page, data.pages, p => loadUsers(p));
+  } catch(e) {
+    document.getElementById('usersTable').innerHTML = `<tr><td colspan="6" style="color:var(--error);padding:16px">Erreur chargement</td></tr>`;
+  }
+}
+
+async function userAction(action, userId) {
+  try {
+    const res  = await fetch(`${API}?action=${action}_user`, {
+      method: 'POST', credentials: 'include', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ user_id: userId })
+    });
+    const data = await res.json();
+    if (data.success) { showToast(data.message, 'success'); loadUsers(currentPage.users); }
+    else showToast(data.error || 'Erreur', 'error');
+  } catch(e) { showToast('Erreur serveur', 'error'); }
+}
+
+// ── RDV ───────────────────────────────────────────────────────
+async function loadRdv(page = 1) {
+  currentPage.rdv = page;
+  document.getElementById('rdvTable').innerHTML = `<tr><td colspan="6" class="loading">Chargement…</td></tr>`;
+
+  try {
+    const res  = await fetch(`${API}?action=get_rdv`, {
+      method: 'POST', credentials: 'include',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ page })
+    });
+    const data = await res.json();
+    if (!res.ok || data.error) throw new Error(data.error || `HTTP ${res.status}`);
+    document.getElementById('rdvCount').textContent = `${data.total} rendez-vous`;
+
+    if (!data.rdvs?.length) {
+      document.getElementById('rdvTable').innerHTML = `<tr><td colspan="6"><div class="empty-state">Aucun rendez-vous</div></td></tr>`;
+      return;
+    }
+
+    const statusColors = { en_attente: 'attente', confirme: 'actif', annule: 'suspendu', effectue: 'actif' };
+    document.getElementById('rdvTable').innerHTML = data.rdvs.map(r => `
+      <tr>
+        <td style="font-size:0.8rem">${formatDate(r.date_heure)}</td>
+        <td>${r.patient_prenom} ${r.patient_nom}</td>
+        <td>Dr. ${r.medecin_prenom} ${r.medecin_nom}</td>
+        <td style="color:var(--muted)">${r.specialite || '—'}</td>
+        <td><span class="badge badge-${statusColors[r.statut] || 'attente'}">${r.statut}</span></td>
+        <td style="color:var(--muted);font-size:0.8rem;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.motif || '—'}</td>
+      </tr>
+    `).join('');
+
+    renderPagination('rdvPagination', data.page, data.pages, p => loadRdv(p));
+  } catch(e) {
+    console.error('[loadRdv]', e);
+    document.getElementById('rdvTable').innerHTML = `<tr><td colspan="6" style="color:var(--error);padding:16px">Erreur chargement : ${e.message}</td></tr>`;
+  }
+}
+
+// ── Logs ──────────────────────────────────────────────────────
+async function loadLogs() {
+  document.getElementById('logsTable').innerHTML = `<tr><td colspan="4" class="loading">Chargement…</td></tr>`;
+  try {
+    const res  = await fetch(`${API}?action=get_logs&limit=100`, { credentials: 'include' });
+    const data = await res.json();
+
+    if (!data.logs?.length) {
+      document.getElementById('logsTable').innerHTML = `<tr><td colspan="4"><div class="empty-state">Aucun journal disponible</div></td></tr>`;
+      return;
+    }
+
+    document.getElementById('logsTable').innerHTML = data.logs.map(l => `
+      <tr>
+        <td style="color:var(--muted);font-size:0.8rem;white-space:nowrap">${formatDate(l.created_at)}</td>
+        <td>${l.prenom} ${l.nom}</td>
+        <td style="color:var(--gold);font-size:0.8rem">${l.action}</td>
+        <td style="color:var(--muted);font-size:0.8rem">${l.details || '—'}</td>
+      </tr>
+    `).join('');
+  } catch(e) {
+    document.getElementById('logsTable').innerHTML = `<tr><td colspan="4" style="color:var(--error);padding:16px">Erreur chargement</td></tr>`;
+  }
+}
+
+// ── Logout ────────────────────────────────────────────────────
+async function handleLogout() {
+  await fetch(`${API}?action=logout`, { method: 'POST', credentials: 'include' });
+  window.location.href = 'login-admin.html';
+}
+
+// ── Helpers ───────────────────────────────────────────────────
+function formatDate(str) {
+  if (!str) return '—';
+  const d = new Date(str);
+  return d.toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit', year:'numeric' })
+       + ' ' + d.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
+}
+
+function renderPagination(containerId, current, total, callback) {
+  const el = document.getElementById(containerId);
+  if (total <= 1) { el.innerHTML = ''; return; }
+  let html = `<button class="page-btn" onclick="(${callback.toString()})(${current - 1})" ${current === 1 ? 'disabled' : ''}>←</button>`;
+  for (let i = 1; i <= total; i++) {
+    if (i === 1 || i === total || Math.abs(i - current) <= 1) {
+      html += `<button class="page-btn ${i === current ? 'active' : ''}" onclick="(${callback.toString()})(${i})">${i}</button>`;
+    } else if (Math.abs(i - current) === 2) {
+      html += `<span style="color:var(--muted)">…</span>`;
+    }
+  }
+  html += `<button class="page-btn" onclick="(${callback.toString()})(${current + 1})" ${current === total ? 'disabled' : ''}>→</button>`;
+  el.innerHTML = html;
+}
+
+let toastTimer;
+function showToast(msg, type = 'success') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = `show ${type}`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 4000);
+}
+
+// Close modal on overlay click
+document.getElementById('rejectModal').addEventListener('click', function(e) {
+  if (e.target === this) closeRejectModal();
+});
+
+// Start
+init();
+</script>
+</body>
+</html>
